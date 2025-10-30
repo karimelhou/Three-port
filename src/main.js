@@ -14,11 +14,11 @@ renderer.setPixelRatio(window.devicePixelRatio || 1);
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x050507);
-scene.fog = new THREE.FogExp2(0x050507, 0.12);
+scene.fog = new THREE.FogExp2(0x050507, 0.1);
 
-const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 200);
-camera.position.set(0, 4, 9);
-camera.lookAt(0, 2.8, 0);
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 220);
+camera.position.set(-2, 4.5, 10);
+camera.lookAt(0, 2.6, 0);
 
 const lights = createLights();
 lights.forEach((light) => scene.add(light));
@@ -29,17 +29,30 @@ const player = new Player(scene);
 const overlay = new OverlayUI();
 const ambience = new AmbientSoundscape();
 
+const interactives = environment.interactives ?? [];
+const totalSeeds = interactives.length;
+let awakenedSeeds = 0;
+
 const clock = new THREE.Clock();
-const controlsHint = createControlsHint();
+const controlsHint = createControlsHint(totalSeeds);
 let activeTrigger = null;
 
-function createControlsHint() {
+function createControlsHint(total) {
   document.body.classList.add("fade-letterbox");
   const hint = document.createElement("div");
   hint.className = "controls-hint";
-  hint.innerHTML = "<span>W A S D</span> — Move | Approach the light to discover.";
   document.body.appendChild(hint);
-  return hint;
+
+  const update = (count) => {
+    const progress = total > 0 ? ` | <span class="collect-count">Awakened seeds ${count}/${total}</span>` : "";
+    hint.innerHTML = `<span>W A S D</span> — Move${progress}`;
+  };
+
+  update(0);
+  return {
+    element: hint,
+    update,
+  };
 }
 
 const keyState = new Map();
@@ -63,21 +76,22 @@ window.addEventListener("resize", () => {
 
 function update() {
   const delta = Math.min(clock.getDelta(), 0.05);
-  player.update(delta, keyState);
   const elapsed = clock.elapsedTime;
+  player.update(delta, keyState);
 
-  // clamp player inside environment bounds
   const bounds = environment.bounds;
   player.position.x = THREE.MathUtils.clamp(player.position.x, bounds.minX, bounds.maxX);
   player.position.z = THREE.MathUtils.clamp(player.position.z, bounds.minZ, bounds.maxZ);
 
-  // Update camera to follow player with slight delay
-  const targetPos = new THREE.Vector3(player.position.x + 1.4, player.position.y + 3.0, player.position.z + 8);
+  if (environment.update) {
+    environment.update(elapsed, delta);
+  }
+
+  const targetPos = new THREE.Vector3(player.position.x + 1.6, player.position.y + 3.6, player.position.z + 9.5);
   camera.position.lerp(targetPos, 0.05);
-  const lookTarget = new THREE.Vector3(player.position.x, player.position.y + 1.5, player.position.z);
+  const lookTarget = new THREE.Vector3(player.position.x, player.position.y + 1.8, player.position.z);
   camera.lookAt(lookTarget);
 
-  // Evaluate triggers
   let nextTrigger = null;
   for (const trigger of triggers) {
     if (trigger.bounds.containsPoint(player.position)) {
@@ -90,27 +104,37 @@ function update() {
     activeTrigger = nextTrigger;
     if (activeTrigger) {
       overlay.show(activeTrigger.content);
-      controlsHint.classList.add("hidden");
+      controlsHint.element.classList.add("hidden");
     } else {
       overlay.hide();
-      controlsHint.classList.remove("hidden");
+      controlsHint.element.classList.remove("hidden");
+    }
+  }
+
+  for (const interactive of interactives) {
+    if (!interactive.activated && player.position.distanceTo(interactive.center) <= interactive.radius) {
+      const activated = interactive.activate ? interactive.activate() : true;
+      if (activated) {
+        interactive.activated = true;
+        awakenedSeeds += 1;
+        controlsHint.update(awakenedSeeds);
+      }
     }
   }
 
   player.updateLantern(triggers);
 
-  // animate trigger glyphs subtly
   for (const trigger of triggers) {
-    const { glyph, lightCone, volumetric } = trigger.visuals.userData;
-    if (glyph) {
-      glyph.material.opacity = 0.45 + Math.sin(elapsed * 0.8 + trigger.center.x) * 0.15;
-      glyph.rotation.z = elapsed * 0.1;
+    const { ring, beam, volumetric } = trigger.visuals.userData;
+    if (ring) {
+      ring.rotation.z = elapsed * 0.4 + trigger.center.x * 0.05;
+      ring.material.opacity = 0.35 + Math.sin(elapsed * 1.2 + trigger.center.x) * 0.15;
     }
-    if (lightCone) {
-      lightCone.material.opacity = 0.18 + Math.sin(elapsed * 1.1 + trigger.center.z) * 0.08;
+    if (beam) {
+      beam.material.opacity = 0.16 + Math.sin(elapsed * 1.1 + trigger.center.z) * 0.08;
     }
     if (volumetric) {
-      volumetric.intensity = 0.35 + Math.sin(elapsed * 0.6 + trigger.center.x * 0.3) * 0.1;
+      volumetric.intensity = 0.35 + Math.sin(elapsed * 0.8 + trigger.center.x * 0.2) * 0.12;
     }
   }
 }

@@ -1,215 +1,262 @@
 import * as THREE from "three";
 
 export function buildEnvironment(scene) {
-  const group = new THREE.Group();
+  const root = new THREE.Group();
 
-  const floorMaterial = new THREE.MeshStandardMaterial({
-    color: 0x15131a,
-    roughness: 0.9,
-    metalness: 0.05,
-  });
-  const wallMaterial = new THREE.MeshStandardMaterial({
-    color: 0x1c1a24,
+  const foundationMaterial = new THREE.MeshStandardMaterial({
+    color: 0x0b0b12,
     roughness: 0.85,
-    metalness: 0.08,
+    metalness: 0.15,
   });
-
-  const floor = new THREE.Mesh(new THREE.BoxGeometry(26, 1, 10), floorMaterial);
-  floor.position.set(0, -0.5, 0);
-  floor.receiveShadow = true;
-  group.add(floor);
-
-  const backWall = new THREE.Mesh(new THREE.BoxGeometry(26, 8, 0.5), wallMaterial);
-  backWall.position.set(0, 3.3, -4.5);
-  backWall.receiveShadow = true;
-  group.add(backWall);
-
-  const ceiling = new THREE.Mesh(new THREE.BoxGeometry(26, 0.5, 10), wallMaterial);
-  ceiling.position.set(0, 7.8, 0);
-  ceiling.receiveShadow = true;
-  group.add(ceiling);
-
-  const planks = new THREE.Group();
-  const plankMaterial = new THREE.MeshStandardMaterial({
-    color: 0x2d2520,
-    roughness: 0.7,
+  const plazaMaterial = new THREE.MeshStandardMaterial({
+    color: 0x181c23,
+    roughness: 0.65,
+    metalness: 0.25,
   });
-  for (let i = -12; i <= 12; i += 1.5) {
-    const plank = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.1, 0.6), plankMaterial);
-    plank.position.set(i, 0.05, 0.2 * Math.sin(i * 0.3));
-    plank.castShadow = true;
-    plank.receiveShadow = true;
-    planks.add(plank);
-  }
-  group.add(planks);
-
-  const pipes = new THREE.Group();
-  const pipeMaterial = new THREE.MeshStandardMaterial({
-    color: 0x4b4e55,
+  const inlayMaterial = new THREE.MeshStandardMaterial({
+    color: 0x0f161f,
+    roughness: 0.45,
     metalness: 0.6,
-    roughness: 0.4,
   });
-  for (let i = -2; i < 3; i++) {
-    const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 12, 16), pipeMaterial);
-    pipe.rotation.z = Math.PI / 2;
-    pipe.position.set(-11 + i * 4, 5.6 - i * 0.4, -2.8);
-    pipe.castShadow = true;
-    pipes.add(pipe);
-  }
-  group.add(pipes);
 
-  const scenery = new THREE.Group();
+  const foundation = new THREE.Mesh(new THREE.BoxGeometry(34, 1.2, 18), foundationMaterial);
+  foundation.position.set(0, -0.6, 0);
+  foundation.receiveShadow = true;
+  root.add(foundation);
 
-  // Intro cage-like arch
-  const archMaterial = new THREE.MeshStandardMaterial({ color: 0x1b1a1f, roughness: 0.8, metalness: 0.2 });
-  const arch = new THREE.Mesh(new THREE.TorusGeometry(1.8, 0.12, 8, 40, Math.PI), archMaterial);
-  arch.rotation.z = Math.PI;
-  arch.position.set(-9, 2.5, -3.6);
-  arch.castShadow = true;
-  scenery.add(arch);
+  const plaza = new THREE.Mesh(new THREE.BoxGeometry(28, 0.4, 8), plazaMaterial);
+  plaza.position.set(0, -0.2, 0);
+  plaza.receiveShadow = true;
+  root.add(plaza);
 
-  const hangingCage = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 1.2, 8, 1, true), archMaterial);
-  hangingCage.position.set(-8.5, 3.2, -1.6);
-  hangingCage.castShadow = true;
-  scenery.add(hangingCage);
+  const inlay = new THREE.Mesh(new THREE.PlaneGeometry(26.5, 6.6), inlayMaterial);
+  inlay.rotation.x = -Math.PI / 2;
+  inlay.position.set(0, 0.01, 0);
+  inlay.receiveShadow = true;
+  root.add(inlay);
 
-  // About area desk
-  const deskMaterial = new THREE.MeshStandardMaterial({ color: 0x2b2420, roughness: 0.7 });
-  const deskTop = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.2, 1), deskMaterial);
-  deskTop.position.set(-2.4, 1.15, -0.8);
-  deskTop.castShadow = true;
-  deskTop.receiveShadow = true;
-  scenery.add(deskTop);
-
-  const deskLeg = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.1, 0.8), deskMaterial);
-  deskLeg.position.set(-3.4, 0.55, -0.8);
-  deskLeg.castShadow = true;
-  deskLeg.receiveShadow = true;
-  scenery.add(deskLeg);
-  const leg2 = deskLeg.clone();
-  leg2.position.x = -1.4;
-  scenery.add(leg2);
-
-  const books = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.25, 0.5), new THREE.MeshStandardMaterial({ color: 0x5f4b3b }));
-  books.position.set(-2.1, 1.4, -0.5);
-  books.castShadow = true;
-  scenery.add(books);
-
-  const candle = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 0.4, 12), new THREE.MeshStandardMaterial({ color: 0xf8e3b9 }));
-  candle.position.set(-2.8, 1.35, -0.75);
-  candle.castShadow = true;
-  scenery.add(candle);
-  const candleFlame = new THREE.PointLight(0xfcd7a4, 0.8, 4, 2.5);
-  candleFlame.position.set(-2.8, 1.65, -0.75);
-  scenery.add(candleFlame);
-
-  // Projects area table of relics
-  const plinthMaterial = new THREE.MeshStandardMaterial({ color: 0x1d2026, roughness: 0.6, metalness: 0.2 });
-  for (let i = 0; i < 3; i++) {
-    const plinth = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.2, 0.9), plinthMaterial);
-    plinth.position.set(3.2 + i * 1.4, 0.6, -0.2 + Math.sin(i * 1.2) * 0.25);
-    plinth.castShadow = true;
-    plinth.receiveShadow = true;
-    scenery.add(plinth);
-
-    const orb = new THREE.Mesh(new THREE.DodecahedronGeometry(0.35, 0), new THREE.MeshStandardMaterial({
-      color: new THREE.Color().setHSL(0.6 + i * 0.1, 0.35, 0.6),
-      emissive: 0x111111,
-      metalness: 0.3,
-      roughness: 0.5,
-    }));
-    orb.position.set(plinth.position.x, 1.5, plinth.position.z);
-    orb.castShadow = true;
-    scenery.add(orb);
-  }
-
-  // Contact area door
-  const doorMaterial = new THREE.MeshStandardMaterial({ color: 0x231b17, roughness: 0.8 });
-  const door = new THREE.Mesh(new THREE.BoxGeometry(1.6, 3.4, 0.2), doorMaterial);
-  door.position.set(10.2, 1.9, -3.9);
-  door.castShadow = true;
-  scenery.add(door);
-
-  const doorFrame = new THREE.Mesh(new THREE.BoxGeometry(1.9, 3.7, 0.1), new THREE.MeshStandardMaterial({ color: 0x342822 }));
-  doorFrame.position.set(10.2, 2.0, -4.2);
-  doorFrame.receiveShadow = true;
-  scenery.add(doorFrame);
-
-  const peephole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.5, 16), new THREE.MeshStandardMaterial({ color: 0xffc76c, emissive: 0x2c1f0d, emissiveIntensity: 0.9 }));
-  peephole.rotation.x = Math.PI / 2;
-  peephole.position.set(10.2, 2.3, -3.8);
-  scenery.add(peephole);
-
-  scene.add(scenery);
-
-  const hangingLights = new THREE.Group();
-  const chainMaterial = new THREE.MeshStandardMaterial({ color: 0x383431, metalness: 0.5, roughness: 0.6 });
+  const pathLines = new THREE.Group();
   const glowMaterial = new THREE.MeshStandardMaterial({
-    color: 0xfadfa5,
-    emissive: 0xfadfa5,
-    emissiveIntensity: 1.1,
+    color: 0x50d7ff,
+    emissive: 0x50d7ff,
+    emissiveIntensity: 1.3,
     transparent: true,
-    opacity: 0.7,
+    opacity: 0.8,
+    metalness: 0.4,
+    roughness: 0.2,
   });
-
-  const spotColors = [0xffd19a, 0xaed7ff, 0xf9b5d0];
-  const anchors = [-7.5, 0, 7.5];
-  anchors.forEach((x, index) => {
-    const chain = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.6, 8), chainMaterial);
-    chain.position.set(x, 6.6, -1.2);
-    chain.castShadow = true;
-
-    const glow = new THREE.Mesh(new THREE.SphereGeometry(0.32, 12, 12), glowMaterial.clone());
-    glow.material.color.setHex(spotColors[index]);
-    glow.material.emissive.setHex(spotColors[index]);
-    glow.position.set(x, 5.8, -0.4);
-
-    const light = new THREE.SpotLight(spotColors[index], 1.0, 10, Math.PI / 4, 0.7, 2.2);
-    light.position.set(x, 6.1, -0.4);
-    light.target.position.set(x, 2.4, index === 1 ? -3 : 0);
-    light.castShadow = true;
-
-    hangingLights.add(chain, glow, light, light.target);
-  });
-  group.add(hangingLights);
-
-  const mistGeometry = new THREE.PlaneGeometry(28, 10);
-  const mistMaterial = new THREE.MeshBasicMaterial({
-    color: 0x3c425a,
-    transparent: true,
-    opacity: 0.18,
-    depthWrite: false,
-  });
-  const mist = new THREE.Mesh(mistGeometry, mistMaterial);
-  mist.rotation.x = -Math.PI / 2;
-  mist.position.set(0, 2.4, -1.5);
-  group.add(mist);
-
-  const particleGeometry = new THREE.BufferGeometry();
-  const particleCount = 220;
-  const positions = new Float32Array(particleCount * 3);
-  for (let i = 0; i < particleCount; i++) {
-    positions[i * 3] = THREE.MathUtils.randFloatSpread(24);
-    positions[i * 3 + 1] = Math.random() * 6 + 1;
-    positions[i * 3 + 2] = THREE.MathUtils.randFloatSpread(4) - 2;
+  for (let i = -1; i <= 1; i++) {
+    const strip = new THREE.Mesh(new THREE.PlaneGeometry(26, 0.25), glowMaterial.clone());
+    strip.rotation.x = -Math.PI / 2;
+    strip.position.set(0, 0.012, i * 1.6);
+    pathLines.add(strip);
   }
-  particleGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  const particles = new THREE.Points(
-    particleGeometry,
-    new THREE.PointsMaterial({ color: 0xe8dba6, size: 0.08, transparent: true, opacity: 0.6 })
-  );
-  particles.position.z = -0.5;
-  group.add(particles);
+  root.add(pathLines);
 
-  scene.add(group);
+  const railMaterial = new THREE.MeshStandardMaterial({ color: 0x1f222a, metalness: 0.6, roughness: 0.3 });
+  const railGroup = new THREE.Group();
+  [-3.6, 3.6].forEach((z) => {
+    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 26, 12), railMaterial);
+    rail.rotation.z = Math.PI / 2;
+    rail.position.set(0, 0.8, z);
+    rail.castShadow = true;
+    railGroup.add(rail);
+    for (let i = -12; i <= 12; i += 4) {
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 1.6, 10), railMaterial);
+      post.position.set(i, 0.8, z);
+      post.castShadow = true;
+      railGroup.add(post);
+    }
+  });
+  root.add(railGroup);
+
+  const road = new THREE.Mesh(
+    new THREE.PlaneGeometry(30, 4.5),
+    new THREE.MeshStandardMaterial({ color: 0x090b11, roughness: 0.6, metalness: 0.35 })
+  );
+  road.rotation.x = -Math.PI / 2;
+  road.position.set(0, -0.19, 3.6);
+  road.receiveShadow = true;
+  root.add(road);
+
+  const roadGlow = new THREE.Mesh(
+    new THREE.PlaneGeometry(24, 0.12),
+    new THREE.MeshStandardMaterial({
+      color: 0xffa94f,
+      emissive: 0xffa94f,
+      emissiveIntensity: 1.4,
+      transparent: true,
+      opacity: 0.85,
+    })
+  );
+  roadGlow.rotation.x = -Math.PI / 2;
+  roadGlow.position.set(0, -0.18, 3.6);
+  root.add(roadGlow);
+
+  const water = new THREE.Mesh(
+    new THREE.PlaneGeometry(32, 12),
+    new THREE.MeshStandardMaterial({
+      color: 0x0e111a,
+      metalness: 0.9,
+      roughness: 0.08,
+      transparent: true,
+      opacity: 0.7,
+    })
+  );
+  water.rotation.x = -Math.PI / 2;
+  water.position.set(0, -0.48, -5.6);
+  water.receiveShadow = true;
+  root.add(water);
+
+  const cityBackdrop = new THREE.Group();
+  const towerMaterial = new THREE.MeshStandardMaterial({ color: 0x13151d, roughness: 0.8, metalness: 0.1 });
+  for (let i = -4; i <= 4; i++) {
+    const height = 4 + Math.random() * 6;
+    const tower = new THREE.Mesh(new THREE.BoxGeometry(1.2 + Math.random(), height, 0.8 + Math.random()), towerMaterial);
+    tower.position.set(i * 3.2, height / 2 + 0.4, -8.6 - Math.random() * 2);
+    tower.receiveShadow = true;
+    cityBackdrop.add(tower);
+  }
+  root.add(cityBackdrop);
+
+  const fogPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(28, 9),
+    new THREE.MeshBasicMaterial({ color: 0x1b2230, transparent: true, opacity: 0.35, depthWrite: false })
+  );
+  fogPlane.position.set(0, 2.5, -7.6);
+  root.add(fogPlane);
+
+  const animatedEntities = [];
+  const interactives = [];
+
+  const synthGarden = new THREE.Group();
+  const trees = [];
+  const treeColors = [0x4fd3ff, 0xff93d2, 0xffd67b];
+  const treePositions = [new THREE.Vector3(-8.4, 0, 2.8), new THREE.Vector3(0.4, 0, 3.4), new THREE.Vector3(7.6, 0, 2.4)];
+
+  treePositions.forEach((pos, index) => {
+    const tree = createSynthTree(pos, 1.1 + Math.random() * 0.4, treeColors[index % treeColors.length]);
+    synthGarden.add(tree.group);
+    trees.push(tree);
+    animatedEntities.push((elapsed) => {
+      tree.group.rotation.y = Math.sin(elapsed * 0.25 + index) * 0.08;
+      tree.leaves.material.emissiveIntensity = tree.glow.value;
+    });
+  });
+  root.add(synthGarden);
+
+  const droneColors = [0x4fd3ff, 0xffaa6f, 0xff90ea];
+  [
+    new THREE.Vector3(-6.5, 2.4, -1.4),
+    new THREE.Vector3(0.5, 2.8, -2.2),
+    new THREE.Vector3(6.8, 2.2, -1.2),
+  ].forEach((position, index) => {
+    const drone = createHoverDrone(position, droneColors[index]);
+    root.add(drone.group);
+    animatedEntities.push((elapsed) => {
+      const offset = Math.sin(elapsed * 1.3 + index) * 0.45;
+      drone.group.position.y = position.y + offset;
+      drone.group.rotation.y = elapsed * 0.4 + index;
+      drone.iris.rotation.y = Math.sin(elapsed * 2 + index);
+    });
+  });
+
+  const holoTotems = new THREE.Group();
+  for (let i = -10; i <= 10; i += 5) {
+    const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.3, 2.4, 16), plazaMaterial);
+    pillar.position.set(i, 1.2, -2.8);
+    pillar.castShadow = true;
+    pillar.receiveShadow = true;
+
+    const halo = new THREE.Mesh(
+      new THREE.TorusGeometry(0.48, 0.04, 16, 48),
+      new THREE.MeshStandardMaterial({
+        color: 0x89f2ff,
+        emissive: 0x89f2ff,
+        emissiveIntensity: 1.2,
+        transparent: true,
+        opacity: 0.6,
+      })
+    );
+    halo.rotation.x = Math.PI / 2;
+    halo.position.set(i, 2.1, -2.8);
+
+    const beam = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.16, 0.12, 3.6, 24, 1, true),
+      new THREE.MeshStandardMaterial({
+        color: 0x4fd3ff,
+        emissive: 0x4fd3ff,
+        emissiveIntensity: 0.7,
+        transparent: true,
+        opacity: 0.28,
+        side: THREE.DoubleSide,
+      })
+    );
+    beam.position.set(i, 1.8, -2.8);
+
+    holoTotems.add(pillar, halo, beam);
+    animatedEntities.push((elapsed) => {
+      halo.rotation.z = elapsed * 0.3;
+      beam.material.opacity = 0.18 + Math.sin(elapsed * 1.6 + i) * 0.1;
+    });
+  }
+  root.add(holoTotems);
+
+  const mistParticles = createParticles();
+  root.add(mistParticles);
+  animatedEntities.push((elapsed) => {
+    mistParticles.rotation.y = elapsed * 0.02;
+  });
+
+  const seedConfigs = [
+    { position: new THREE.Vector3(-6.2, 0.5, 2.1), tint: 0x4fd3ff, tree: trees[0] },
+    { position: new THREE.Vector3(0.8, 0.5, 2.9), tint: 0xff93d2, tree: trees[1] },
+    { position: new THREE.Vector3(6.4, 0.5, 2.0), tint: 0xffd67b, tree: trees[2] },
+  ];
+
+  seedConfigs.forEach((config, index) => {
+    const seed = createMemorySeed(config.position, config.tint);
+    root.add(seed.group);
+    interactives.push({
+      center: config.position,
+      radius: 1.6,
+      activated: false,
+      activate: () => {
+        if (seed.state.activated) return false;
+        seed.state.activated = true;
+        seed.light.intensity = 2.2;
+        seed.ring.scale.setScalar(1.6);
+        seed.group.position.y += 0.1;
+        config.tree.glow.value = 1.8;
+        return true;
+      },
+    });
+    animatedEntities.push((elapsed) => {
+      const pulse = 0.8 + Math.sin(elapsed * 1.6 + index) * 0.2;
+      seed.ring.rotation.x = elapsed * 0.8 + index;
+      seed.group.position.y = 0.5 + Math.sin(elapsed * 1.1 + index) * 0.12;
+      seed.light.intensity = seed.state.activated ? 2.2 : 1.2 * pulse;
+      if (!seed.state.activated) {
+        config.tree.glow.value = THREE.MathUtils.lerp(config.tree.glow.value, 0.9 + pulse * 0.3, 0.02);
+      } else {
+        config.tree.glow.value = THREE.MathUtils.lerp(config.tree.glow.value, 1.8, 0.04);
+      }
+    });
+  });
+
+  scene.add(root);
 
   return {
     bounds: {
-      minX: -11.5,
-      maxX: 11.5,
-      minZ: -1.8,
-      maxZ: 1.8,
+      minX: -13.5,
+      maxX: 13.5,
+      minZ: -3.1,
+      maxZ: 3.6,
     },
+    update(elapsed) {
+      animatedEntities.forEach((fn) => fn(elapsed));
+    },
+    interactives,
   };
 }
 
@@ -217,56 +264,83 @@ export function createRoomTriggers(scene) {
   const triggerData = [
     {
       name: "intro",
-      center: new THREE.Vector3(-8.5, 0.8, 0),
-      radius: 2.2,
-      tint: new THREE.Color(0xffd19a),
+      center: new THREE.Vector3(-11.2, 0.6, 0.2),
+      radius: 2.6,
+      tint: new THREE.Color(0x4fd3ff),
       content: {
-        title: "Welcome, Little Dreamer",
-        body: `You wake in a forgotten gallery, clutching a lantern. This is the doorway into my craft —
-          an interactive portfolio steeped in atmosphere and small stories.`,
+        subtitle: "Signal Received",
+        title: "The Lantern Runner",
+        body: `<p>You awaken on a rain-slicked skyway, a survey unit stitched together from repurposed relics.</p>
+          <p>Follow the cyan beacons, ignite dormant seeds, and let this portfolio unfold like a nocturnal expedition.</p>`,
       },
     },
     {
       name: "about",
-      center: new THREE.Vector3(-2.2, 0.8, 0.4),
-      radius: 2.5,
-      tint: new THREE.Color(0xaed7ff),
+      center: new THREE.Vector3(-5.4, 0.6, -0.6),
+      radius: 2.2,
+      tint: new THREE.Color(0xffa94f),
       content: {
+        subtitle: "Origin Story",
         title: "About Me",
-        body: `<p>I am a game developer and designer crafting moody, tactile worlds. I blend
-          narrative design with systems-thinking to build experiences that linger.</p>
+        body: `<p>I build tactile, narrative-rich worlds for games and interactive art installations.</p>
           <ul>
-            <li>World building &amp; level design</li>
-            <li>Real-time rendering &amp; shaders</li>
-            <li>Interaction design &amp; storytelling</li>
+            <li>Experience design &amp; world building for immersive media</li>
+            <li>Rendering, shaders, and real-time storytelling pipelines</li>
+            <li>Creative direction for atmospheric, emotionally charged spaces</li>
           </ul>`,
       },
     },
     {
       name: "projects",
-      center: new THREE.Vector3(4.4, 0.8, -0.3),
-      radius: 2.8,
-      tint: new THREE.Color(0xf9b5d0),
+      center: new THREE.Vector3(-0.2, 0.6, -1.2),
+      radius: 2.4,
+      tint: new THREE.Color(0xff93d2),
       content: {
+        subtitle: "Archive",
         title: "Projects",
-        body: `<p>Each relic in this chamber is a memory of past voyages.</p>
+        body: `<p>Artifacts suspended in stasis narrate earlier voyages.</p>
           <ul>
-            <li><strong>Echoes of the Maw</strong> — stealth adventure prototype exploring scale and fear.</li>
-            <li><strong>Paper Lanterns</strong> — atmospheric WebGL poem with generative music.</li>
-            <li><strong>Harbor Lights</strong> — tactile UI experiment for an interactive narrative.</li>
+            <li><strong>Echoes of the Maw</strong> — stealth survival vignette with reactive lighting AI.</li>
+            <li><strong>Paper Lanterns</strong> — generative WebGL poem that paints with fog and fragments.</li>
+            <li><strong>Harbor Lights</strong> — co-op UI experiment blending tactile knobs with spatial audio.</li>
           </ul>`,
       },
     },
     {
-      name: "contact",
-      center: new THREE.Vector3(9.6, 0.8, 0),
-      radius: 2.3,
-      tint: new THREE.Color(0xffc76c),
+      name: "playlab",
+      center: new THREE.Vector3(4.8, 0.6, 1.6),
+      radius: 2.4,
+      tint: new THREE.Color(0x50d7ff),
       content: {
+        subtitle: "Play Lab",
+        title: "Prototype Garden",
+        body: `<p>Roadside terminals host sketches-in-progress: small physics toys, AI-driven ambience studies, and narrative systems tests.</p>
+          <p>The interactive seeds nearby awaken ambient reactions—feel free to activate them all.</p>`,
+      },
+    },
+    {
+      name: "process",
+      center: new THREE.Vector3(7.6, 0.6, -0.8),
+      radius: 2.4,
+      tint: new THREE.Color(0xffd67b),
+      content: {
+        subtitle: "Process",
+        title: "How I Work",
+        body: `<p>I iterate in playable mood boards: block out lighting first, script interactions second, refine narrative beats last.</p>
+          <p>Production pillars: rapid greyboxing, shader prototyping, collaborative docs, and playtest-driven refinements.</p>`,
+      },
+    },
+    {
+      name: "contact",
+      center: new THREE.Vector3(11.2, 0.6, -0.1),
+      radius: 2.5,
+      tint: new THREE.Color(0x89f2ff),
+      content: {
+        subtitle: "Transmission",
         title: "Contact",
-        body: `<p>Push the creaking door to send word.</p>
+        body: `<p>Signal the workshop for collaborations or atmospheric adventures.</p>
           <p>Email: <a href="mailto:lantern@moodyport.io">lantern@moodyport.io</a><br />
-          LinkedIn: <a href="https://linkedin.com" target="_blank" rel="noreferrer">/in/shadow-weaver</a></p>`,
+          Mastodon: <a href="https://mastodon.social/@lantern" target="_blank" rel="noreferrer">@lantern</a></p>`,
       },
     },
   ];
@@ -285,39 +359,62 @@ function createTriggerVisual({ center, radius, tint }) {
   const visuals = new THREE.Group();
   visuals.userData = {};
 
-  const glyph = new THREE.Mesh(
-    new THREE.RingGeometry(radius * 0.3, radius * 0.35, 32, 1, Math.PI / 2, Math.PI * 1.3),
+  const disc = new THREE.Mesh(
+    new THREE.CylinderGeometry(radius * 0.16, radius * 0.16, 0.05, 48),
     new THREE.MeshStandardMaterial({
-      color: tint.clone().multiplyScalar(0.5),
+      color: tint.clone().multiplyScalar(0.4),
       emissive: tint,
-      emissiveIntensity: 0.8,
+      emissiveIntensity: 0.4,
       transparent: true,
-      opacity: 0.75,
+      opacity: 0.6,
     })
   );
-  glyph.rotation.x = -Math.PI / 2;
-  glyph.position.copy(center).setY(0.05);
+  disc.position.copy(center).setY(0.02);
+  visuals.add(disc);
 
-  const lightCone = new THREE.Mesh(
-    new THREE.ConeGeometry(radius * 0.5, 4, 24, 1, true),
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(radius * 0.55, radius * 0.04, 24, 64),
+    new THREE.MeshStandardMaterial({
+      color: tint,
+      emissive: tint,
+      emissiveIntensity: 1.1,
+      transparent: true,
+      opacity: 0.5,
+    })
+  );
+  ring.rotation.x = Math.PI / 2;
+  ring.position.copy(center).setY(0.08);
+  visuals.add(ring);
+
+  const monolith = new THREE.Mesh(
+    new THREE.BoxGeometry(radius * 0.8, radius * 1.6, radius * 0.3),
+    new THREE.MeshStandardMaterial({ color: 0x181c23, roughness: 0.7, metalness: 0.2 })
+  );
+  monolith.position.copy(center).setY(radius * 0.8 + 0.05).setZ(center.z - 0.4);
+  monolith.castShadow = true;
+  visuals.add(monolith);
+
+  const beam = new THREE.Mesh(
+    new THREE.CylinderGeometry(radius * 0.25, radius * 0.1, radius * 2.4, 24, 1, true),
     new THREE.MeshStandardMaterial({
       color: tint,
       emissive: tint,
       emissiveIntensity: 0.6,
       transparent: true,
-      opacity: 0.32,
+      opacity: 0.22,
       side: THREE.DoubleSide,
       depthWrite: false,
     })
   );
-  lightCone.position.copy(center).setY(0);
+  beam.position.copy(center).setY(radius * 1.4);
+  visuals.add(beam);
 
-  const volumetric = new THREE.PointLight(tint, 0.6, 6, 2.5);
-  volumetric.position.copy(center).setY(2.4);
+  const volumetric = new THREE.PointLight(tint, 0.6, radius * 4, 2.5);
+  volumetric.position.copy(center).setY(radius * 1.8);
+  visuals.add(volumetric);
 
-  visuals.add(glyph, lightCone, volumetric);
-  visuals.userData.glyph = glyph;
-  visuals.userData.lightCone = lightCone;
+  visuals.userData.ring = ring;
+  visuals.userData.beam = beam;
   visuals.userData.volumetric = volumetric;
 
   const bounds = new THREE.Sphere(center.clone(), radius);
@@ -329,4 +426,135 @@ function createTriggerVisual({ center, radius, tint }) {
     visuals,
     content: null,
   };
+}
+
+function createSynthTree(position, scale, tint) {
+  const group = new THREE.Group();
+  group.position.copy(position);
+
+  const trunk = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.25 * scale, 0.2 * scale, 1.6 * scale, 12),
+    new THREE.MeshStandardMaterial({ color: 0x222831, roughness: 0.65, metalness: 0.25 })
+  );
+  trunk.position.y = 0.8 * scale;
+  trunk.castShadow = true;
+  trunk.receiveShadow = true;
+  group.add(trunk);
+
+  const branches = new THREE.Mesh(
+    new THREE.ConeGeometry(0.45 * scale, 1.2 * scale, 6, 1, true),
+    new THREE.MeshStandardMaterial({ color: 0x2d323c, roughness: 0.6, metalness: 0.35 })
+  );
+  branches.position.y = 1.4 * scale;
+  branches.castShadow = true;
+  group.add(branches);
+
+  const leavesMaterial = new THREE.MeshStandardMaterial({
+    color: tint,
+    emissive: tint,
+    emissiveIntensity: 0.8,
+    transparent: true,
+    opacity: 0.75,
+  });
+
+  const leaves = new THREE.Mesh(new THREE.IcosahedronGeometry(0.72 * scale, 1), leavesMaterial);
+  leaves.position.y = 2 * scale;
+  leaves.castShadow = true;
+  group.add(leaves);
+
+  return { group, leaves, glow: { value: 1.0 } };
+}
+
+function createHoverDrone(position, tint) {
+  const group = new THREE.Group();
+  group.position.copy(position);
+
+  const shell = new THREE.Mesh(
+    new THREE.SphereGeometry(0.32, 24, 18),
+    new THREE.MeshStandardMaterial({ color: 0x1e242f, metalness: 0.9, roughness: 0.2 })
+  );
+  const iris = new THREE.Mesh(
+    new THREE.RingGeometry(0.1, 0.22, 32),
+    new THREE.MeshStandardMaterial({ color: tint, emissive: tint, emissiveIntensity: 1.2 })
+  );
+  iris.rotation.x = Math.PI / 2;
+  iris.position.z = 0.28;
+
+  const light = new THREE.PointLight(tint, 1.1, 6, 2.2);
+  light.position.set(0, 0, 0.2);
+
+  const fins = new THREE.Mesh(
+    new THREE.ConeGeometry(0.06, 0.3, 3),
+    new THREE.MeshStandardMaterial({ color: 0x2d323c, metalness: 0.7, roughness: 0.3 })
+  );
+  fins.position.set(0, -0.32, 0);
+
+  group.add(shell, iris, light, fins);
+
+  return { group, iris };
+}
+
+function createMemorySeed(position, tint) {
+  const group = new THREE.Group();
+  group.position.copy(position);
+
+  const orb = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(0.18, 1),
+    new THREE.MeshStandardMaterial({
+      color: tint,
+      emissive: tint,
+      emissiveIntensity: 1.1,
+      metalness: 0.5,
+      roughness: 0.25,
+      transparent: true,
+      opacity: 0.92,
+    })
+  );
+
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(0.28, 0.03, 12, 48),
+    new THREE.MeshStandardMaterial({
+      color: tint,
+      emissive: tint,
+      emissiveIntensity: 1.0,
+      transparent: true,
+      opacity: 0.7,
+    })
+  );
+  ring.rotation.x = Math.PI / 2;
+
+  const light = new THREE.PointLight(tint, 1.1, 6, 2.6);
+
+  group.add(orb, ring, light);
+
+  return {
+    group,
+    ring,
+    light,
+    state: { activated: false },
+  };
+}
+
+function createParticles() {
+  const particleGeometry = new THREE.BufferGeometry();
+  const particleCount = 260;
+  const positions = new Float32Array(particleCount * 3);
+  const sizes = new Float32Array(particleCount);
+  for (let i = 0; i < particleCount; i++) {
+    positions[i * 3] = THREE.MathUtils.randFloatSpread(24);
+    positions[i * 3 + 1] = Math.random() * 4 + 1.5;
+    positions[i * 3 + 2] = THREE.MathUtils.randFloat(-4, 3.5);
+    sizes[i] = Math.random() * 0.6 + 0.2;
+  }
+  particleGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  particleGeometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
+
+  const material = new THREE.PointsMaterial({
+    color: 0xc8f1ff,
+    size: 0.16,
+    transparent: true,
+    opacity: 0.6,
+  });
+
+  return new THREE.Points(particleGeometry, material);
 }
