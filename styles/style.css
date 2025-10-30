@@ -1,0 +1,108 @@
+:root {
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  color: #f5f0e6;
+  background: #060608;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: radial-gradient(circle at 20% 20%, rgba(80, 80, 120, 0.08), transparent 55%),
+    radial-gradient(circle at 80% 10%, rgba(200, 180, 120, 0.08), transparent 45%),
+    #050506;
+}
+
+#game-canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+#overlay.visible {
+  opacity: 1;
+}
+
+.overlay-card {
+  pointer-events: auto;
+  background: rgba(15, 12, 20, 0.85);
+  border: 1px solid rgba(220, 200, 160, 0.25);
+  padding: 2.5rem;
+  max-width: 480px;
+  width: 100%;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+  text-align: left;
+}
+
+.overlay-card h1,
+.overlay-card h2 {
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  margin-top: 0;
+  text-transform: uppercase;
+  color: #f4e1bb;
+}
+
+.overlay-card p,
+.overlay-card li {
+  line-height: 1.6;
+  color: #cfd1d8;
+}
+
+.overlay-card ul {
+  padding-left: 1.2rem;
+}
+
+.controls-hint {
+  position: fixed;
+  left: 1.2rem;
+  bottom: 1.2rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(220, 210, 190, 0.65);
+  transition: opacity 0.6s ease;
+}
+
+.controls-hint.hidden {
+  opacity: 0;
+}
+
+.fade-letterbox::before,
+.fade-letterbox::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 12vh;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.8s ease;
+}
+
+.fade-letterbox::before {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.92), transparent);
+}
+
+.fade-letterbox::after {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.92), transparent);
+}
+
+.fade-letterbox.hidden::before,
+.fade-letterbox.hidden::after {
+  opacity: 0;
+}
