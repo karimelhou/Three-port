@@ -1,0 +1,182 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap");
+
+:root {
+  font-family: "Space Grotesk", "Inter", "Helvetica Neue", Arial, sans-serif;
+  color: #e7f2ff;
+  background: #050509;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 15%, rgba(80, 105, 140, 0.22), transparent 55%),
+    radial-gradient(circle at 70% 8%, rgba(255, 173, 92, 0.25), transparent 45%),
+    linear-gradient(180deg, #070711 0%, #040308 100%);
+  color: inherit;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, transparent 60%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.35;
+}
+
+#game-canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 3rem);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+#overlay.visible {
+  opacity: 1;
+}
+
+.overlay-card {
+  pointer-events: auto;
+  background: linear-gradient(155deg, rgba(18, 20, 32, 0.88), rgba(9, 11, 19, 0.82));
+  border: 1px solid rgba(120, 195, 255, 0.25);
+  padding: clamp(1.5rem, 3.5vw, 2.75rem);
+  max-width: 520px;
+  width: 100%;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.65);
+  position: relative;
+  overflow: hidden;
+}
+
+.overlay-card::after {
+  content: "";
+  position: absolute;
+  inset: -40% -20% auto;
+  height: 140%;
+  background: radial-gradient(circle at top, rgba(92, 198, 255, 0.28), transparent 65%);
+  opacity: 0.7;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.overlay-header {
+  position: relative;
+  z-index: 1;
+}
+
+.overlay-subtitle {
+  display: inline-block;
+  font-size: 0.8rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(144, 205, 255, 0.75);
+  margin-bottom: 0.6rem;
+}
+
+.overlay-header h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f8f1da;
+}
+
+.overlay-divider {
+  height: 2px;
+  width: 100%;
+  margin: 1rem 0 1.2rem;
+  background: linear-gradient(90deg, rgba(79, 211, 255, 0), rgba(79, 211, 255, 0.7), rgba(255, 147, 210, 0));
+}
+
+.overlay-body {
+  position: relative;
+  z-index: 1;
+}
+
+.overlay-body p,
+.overlay-body li {
+  line-height: 1.6;
+  color: rgba(225, 237, 255, 0.78);
+}
+
+.overlay-body ul {
+  padding-left: 1.2rem;
+  margin: 0.5rem 0;
+}
+
+.overlay-body a {
+  color: #8ae2ff;
+  text-decoration: none;
+}
+
+.overlay-body a:hover {
+  text-decoration: underline;
+}
+
+.controls-hint {
+  position: fixed;
+  left: clamp(1rem, 3vw, 1.8rem);
+  bottom: clamp(1rem, 4vw, 1.8rem);
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(190, 210, 240, 0.75);
+  padding: 0.75rem 1.2rem;
+  border: 1px solid rgba(120, 195, 255, 0.28);
+  background: rgba(10, 12, 18, 0.7);
+  backdrop-filter: blur(8px);
+  transition: opacity 0.6s ease;
+}
+
+.controls-hint span {
+  color: #f1f4ff;
+}
+
+.collect-count {
+  color: rgba(255, 163, 92, 0.9);
+}
+
+.controls-hint.hidden {
+  opacity: 0;
+}
+
+.fade-letterbox::before,
+.fade-letterbox::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 12vh;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.8s ease;
+}
+
+.fade-letterbox::before {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.92), transparent);
+}
+
+.fade-letterbox::after {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.92), transparent);
+}
+
+.fade-letterbox.hidden::before,
+.fade-letterbox.hidden::after {
+  opacity: 0;
+}
