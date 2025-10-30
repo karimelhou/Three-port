@@ -7,14 +7,10 @@ export class OverlayUI {
     this.hide();
   }
 
-  show({ subtitle, title, body }) {
+  show({ title, body }) {
     this.card.innerHTML = `
-      <div class="overlay-header">
-        <span class="overlay-subtitle">${subtitle ?? "Portfolio Node"}</span>
-        <h1>${title}</h1>
-        <div class="overlay-divider"></div>
-      </div>
-      <div class="overlay-body">${body}</div>
+      <h1>${title}</h1>
+      <div>${body}</div>
     `;
     this.container.classList.add("visible");
   }
